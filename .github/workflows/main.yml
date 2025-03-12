@@ -1,0 +1,40 @@
+name: Test Self-Hosted Runner and Send Email
+
+on: [push]
+
+jobs:
+  test-self-hosted-runner:
+    runs-on: self-hosted  # Use a self-hosted runner
+    steps:
+    - name: Check if runner is working
+      run: |
+        echo "Self-hosted runner is working fine."
+        # Optionally, add more commands to test the runner
+
+    - name: Send success email
+      if: success()  # Only send email if the test passed
+      run: |
+        curl -X POST https://api.sendgrid.com/v3/mail/send \
+        -H "Authorization: Bearer ${{ secrets.selfhosted }}" \
+        -H "Content-Type: application/json" \
+        -d '{
+              "personalizations": [
+                {
+                  "to": [
+                    {
+                      "email": "hema565374@gmail.com"
+                    }
+                  ],
+                  "subject": "Test Passed on Self-Hosted Runner"
+                }
+              ],
+              "from": {
+                "email": "hema.vaddi4362.com"
+              },
+              "content": [
+                {
+                  "type": "text/plain",
+                  "value": "The test on the self-hosted runner has passed successfully!"
+                }
+              ]
+            }'
